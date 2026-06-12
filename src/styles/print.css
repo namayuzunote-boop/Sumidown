@@ -19,6 +19,21 @@
   color: #1f2328;
 }
 
+/* Tables: the page is much narrower than the editor, so reclaim every
+   pixel — no minimum cell width (a "#" column should be as narrow as
+   its content), tighter padding, slightly smaller text. Applies to both
+   PDF (print) and the exported HTML. */
+#print-root table {
+  font-size: 0.85em;
+  line-height: 1.55;
+}
+
+#print-root th,
+#print-root td {
+  min-width: 0;
+  padding: 4px 8px;
+}
+
 @page {
   size: A4;
   margin: 18mm;
@@ -52,6 +67,7 @@
   #print-root img {
     break-inside: avoid;
   }
+
 
   #print-root h1,
   #print-root h2,

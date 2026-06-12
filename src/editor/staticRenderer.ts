@@ -45,7 +45,28 @@ export async function renderStatic(
     .create();
 
   await waitForDiagrams(container);
+  fitTables(container);
   return () => editor.destroy();
+}
+
+/**
+ * The printed page is much narrower than the editor. Tables whose natural
+ * (no-wrap) width exceeds the page get scaled down — up to 30% — so columns
+ * keep their natural width instead of wrapping mid-word. Wider tables than
+ * that fall back to wrapping at the reduced size.
+ */
+function fitTables(container: HTMLElement) {
+  for (const table of Array.from(container.querySelectorAll<HTMLElement>("table"))) {
+    const avail = table.parentElement?.clientWidth ?? container.clientWidth;
+    if (avail <= 0) continue;
+    const prev = table.style.width;
+    table.style.width = "max-content";
+    const natural = table.scrollWidth;
+    table.style.width = prev;
+    if (natural > avail) {
+      table.style.zoom = String(Math.max(0.7, avail / natural));
+    }
+  }
 }
 
 /** Mermaid renders asynchronously; wait until every diagram has an SVG. */
