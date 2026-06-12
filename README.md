@@ -68,3 +68,5 @@ npm run tauri build  # production build (.app / .dmg)
 ## License
 
 [MIT](LICENSE)
+
+Sumidown is built on open-source libraries (Milkdown, Mermaid, KaTeX, CodeMirror, Tauri, and others), used as dependencies under their respective licenses. See [THIRD-PARTY-LICENSES.txt](THIRD-PARTY-LICENSES.txt) for the full list and license texts bundled with distributed binaries.

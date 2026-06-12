@@ -68,3 +68,5 @@ npm run tauri build  # 配布用ビルド(.app / .dmg)
 ## ライセンス
 
 [MIT](LICENSE)
+
+Sumidown はオープンソースライブラリ(Milkdown・Mermaid・KaTeX・CodeMirror・Tauri など)を、それぞれのライセンスに基づく**依存ライブラリ**として利用しています(コードのコピーではありません)。配布バイナリに同梱される全ライブラリの一覧とライセンス文は [THIRD-PARTY-LICENSES.txt](THIRD-PARTY-LICENSES.txt) を参照してください。
