@@ -2,7 +2,7 @@
 
 **[English](README.md) | [日本語](README.ja.md)**
 
-A lightweight, simple WYSIWYG Markdown editor. Free, MIT-licensed, and cross-platform (built with Tauri 2).
+A lightweight, simple WYSIWYG Markdown editor. Free and MIT-licensed, built with Tauri 2.
 
 It was built to solve three recurring pain points in a coding-agent-era Markdown workflow:
 
@@ -22,6 +22,14 @@ It was built to solve three recurring pain points in a coding-agent-era Markdown
 - **Automatic reload on external changes**: if a coding agent (or any other tool) rewrites the file on disk, the editor picks it up automatically (a notice bar appears if you have unsaved edits)
 - **Image paste**: images from the clipboard are saved into `assets/` and inserted with a relative path
 - **Dark/light theme** that follows the OS setting
+
+## Supported platforms
+
+| OS | Status |
+| --- | --- |
+| **macOS** (Apple Silicon) | ✅ Tested; a `.dmg` is provided |
+| macOS (Intel) | Not built yet (building from source should work, but is unverified) |
+| Windows / Linux | ❌ Not supported yet. Tauri itself is cross-platform, but the current path handling is Unix-specific, so simply building it will not work. Support is planned. |
 
 ## Security
 
