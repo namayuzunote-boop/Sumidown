@@ -1,58 +1,60 @@
 # MarkdownEditor
 
-軽量・シンプルな WYSIWYG Markdown エディタ。無料・MIT ライセンス・マルチプラットフォーム(Tauri 2)。
+**[English](README.md) | [日本語](README.ja.md)**
 
-コーディングエージェント時代の Markdown ワークフローにある3つの課題を解決するために作られました:
+A lightweight, simple WYSIWYG Markdown editor. Free, MIT-licensed, and cross-platform (built with Tauri 2).
 
-1. **PDF 変換でレイアウトが崩れる** → プレビューと同一のレンダラ(WebView)から印刷するため、構造的にレイアウト崩れが起きません
-2. **プレビュー状態で編集できない** → 常に WYSIWYG。テーブルはセル直接編集+行/列のGUI追加・削除、Mermaid 図と数式はクリックでコード編集
-3. **図が表示できない** → Mermaid(フローチャート・シーケンス図など)を即時レンダリング
+It was built to solve three recurring pain points in a coding-agent-era Markdown workflow:
 
-## 機能
+1. **PDF export breaks the layout** → The PDF is printed from the very same renderer (WebView) that drives the preview, so there is no structural layout drift.
+2. **You can't edit while previewing** → The editor is always WYSIWYG. Tables can be edited directly in cells plus a GUI for adding/removing rows and columns; Mermaid diagrams and math blocks are edited by clicking on them.
+3. **Diagrams don't render** → Mermaid blocks (flowcharts, sequence diagrams, etc.) are rendered immediately.
 
-- **WYSIWYG 編集**(Typora スタイル)+ ソース表示トグル(⌘/)
-- **テーブル GUI 編集**: セル直接編集、ホバーで行・列の追加/削除/整列/ドラッグ移動
-- **Mermaid 図**: ```` ```mermaid ```` ブロックを即時描画。クリックでコード編集、ライブプレビュー
-- **KaTeX 数式**: インライン `$...$` / ブロック `$$...$$`(クリックで編集)
-- **レイアウト忠実な PDF 出力**(⌘E): プレビューと同じエンジンで描画 → システム印刷ダイアログから「PDFとして保存」。`@page` マージン、テーブル・図・コードの泣き別れ防止つき
-- **単一ファイル HTML 出力**(CSS インライン)
-- **フォルダツリー**: サイドバーで .md ファイルを一覧・切替
-- **外部変更の自動リロード**: コーディングエージェントがファイルを書き換えると自動反映(未保存編集がある場合は通知バー)
-- **画像ペースト**: クリップボードの画像を `assets/` に保存して相対パスで挿入
-- **ダーク/ライトテーマ**(OS 追従)
+## Features
 
-## セキュリティ
+- **WYSIWYG editing** (Typora-style) with a source-view toggle (⌘/)
+- **GUI table editing**: edit cells directly, and add/remove/align/reorder rows and columns from hover controls
+- **Mermaid diagrams**: ` ```mermaid ` code blocks render instantly; click to edit the source with a live preview
+- **KaTeX math**: inline `$...$` and block `$$...$$` math (click to edit)
+- **Layout-faithful PDF export** (⌘E): rendered by the same engine as the preview, then sent to the system print dialog so you can "Save as PDF". Includes `@page` margins and avoids awkward page breaks inside tables, diagrams, and code blocks
+- **Single-file HTML export** with inlined CSS
+- **Folder tree** sidebar to list and switch between `.md` files
+- **Automatic reload on external changes**: if a coding agent (or any other tool) rewrites the file on disk, the editor picks it up automatically (a notice bar appears if you have unsaved edits)
+- **Image paste**: images from the clipboard are saved into `assets/` and inserted with a relative path
+- **Dark/light theme** that follows the OS setting
 
-- ファイルアクセスは「ユーザーが開いたフォルダ」配下に制限(Rust 側でパス検証)
-- 厳格な CSP(リモートスクリプト不可)
-- Mermaid は `securityLevel: "strict"` で描画
+## Security
 
-## 開発
+- File access is restricted to the folder the user opened, validated on the Rust side
+- A strict Content Security Policy (no remote scripts)
+- Mermaid renders with `securityLevel: "strict"`
 
-必要なもの: Node.js 20+、Rust(stable)、macOS は Xcode Command Line Tools
+## Development
+
+Requirements: Node.js 20+, Rust (stable); on macOS, the Xcode Command Line Tools.
 
 ```bash
 npm install
-npm run tauri dev    # デスクトップアプリとして起動
-npm run dev          # ブラウザでUIのみ確認(デモドキュメント)
-npm run tauri build  # 配布用ビルド(.app / .dmg)
+npm run tauri dev    # run as a desktop app
+npm run dev          # browser-only UI preview (demo document)
+npm run tauri build  # production build (.app / .dmg)
 ```
 
-## ショートカット
+## Keyboard shortcuts
 
-| キー | 動作 |
+| Key | Action |
 | --- | --- |
-| ⌘O | フォルダを開く |
-| ⌘S | 保存 |
-| ⌘/ | ソース表示 ⇔ プレビュー |
-| ⌘E | PDF 出力 |
+| ⌘O | Open folder |
+| ⌘S | Save |
+| ⌘/ | Toggle source view ⇔ preview |
+| ⌘E | Export PDF |
 
-## 技術スタック
+## Tech stack
 
-- [Tauri 2](https://tauri.app/)(Rust + OS WebView、バイナリ約10MB)
-- [Milkdown](https://milkdown.dev/)(ProseMirror ベースの WYSIWYG Markdown フレームワーク)
+- [Tauri 2](https://tauri.app/) (Rust + OS WebView, ~10 MB binary)
+- [Milkdown](https://milkdown.dev/) (ProseMirror-based WYSIWYG Markdown framework)
 - [Mermaid](https://mermaid.js.org/) / [KaTeX](https://katex.org/) / [CodeMirror 6](https://codemirror.net/)
 
-## ライセンス
+## License
 
 [MIT](LICENSE)
