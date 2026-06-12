@@ -1,0 +1,38 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - run: npm ci
+
+      - name: Build app
+        run: npm run tauri build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MarkdownEditor-macos
+          path: src-tauri/target/release/bundle/dmg/*.dmg
+
+  # Windows / Linux ビルドはこのジョブをコピーして runs-on を
+  # windows-latest / ubuntu-latest に変えるだけで追加できます
+  # (Linux は libwebkit2gtk-4.1-dev 等の apt 依存が必要)。

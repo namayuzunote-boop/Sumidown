@@ -1,0 +1,61 @@
+/* The export renderer mounts into #print-root. On screen it is laid out
+   off-viewport (mermaid needs real layout to measure text); during print
+   it becomes the only visible element. Same DOM, same CSS as the editor. */
+
+#print-root {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 174mm; /* A4 width minus margins, so on-screen layout == page layout */
+  background: #ffffff;
+}
+
+#print-root .milkdown {
+  color: #1f2328;
+}
+
+@page {
+  size: A4;
+  margin: 18mm;
+}
+
+@media print {
+  html.print-mode body > #root {
+    display: none;
+  }
+
+  html.print-mode #print-root {
+    position: static;
+    left: auto;
+    width: auto;
+  }
+
+  #print-root {
+    --bg: #ffffff;
+    --bg-secondary: #f6f8fa;
+    --fg: #1f2328;
+    --fg-muted: #59636e;
+    --border: #d1d9e0;
+    --accent: #0969da;
+  }
+
+  /* Keep tables, diagrams, code blocks and images on one page */
+  #print-root table,
+  #print-root pre,
+  #print-root blockquote,
+  #print-root [data-type="diagram"],
+  #print-root img {
+    break-inside: avoid;
+  }
+
+  #print-root h1,
+  #print-root h2,
+  #print-root h3 {
+    break-after: avoid;
+  }
+
+  #print-root pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+}
