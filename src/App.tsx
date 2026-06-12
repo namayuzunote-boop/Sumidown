@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import MilkdownEditor from "./editor/MilkdownEditor";
-import SourceView from "./components/SourceView";
+import MilkdownEditor, { type MilkdownEditorHandle } from "./editor/MilkdownEditor";
+import SourceView, { type SourceViewHandle } from "./components/SourceView";
 import Sidebar from "./components/Sidebar";
 import {
   chooseFolder,
@@ -14,6 +14,7 @@ import {
   type FileNode,
 } from "./services/fileService";
 import { exportPdf, exportHtml } from "./services/exportService";
+import { blockIndexToOffset, offsetToBlockIndex } from "./editor/sourceMap";
 import "./styles/app.css";
 import "./styles/editor.css";
 import "./styles/print.css";
@@ -30,6 +31,13 @@ export default function App() {
   // editorEpoch forces a remount of the editor when content is replaced
   // from outside (file switch, reload, source-mode toggle).
   const [editorEpoch, setEditorEpoch] = useState(0);
+  // Cursor position carried across the preview/source toggle. Both are
+  // derived from the same `content` string: the source view gets a char
+  // offset, the WYSIWYG view gets a top-level block index.
+  const [pendingOffset, setPendingOffset] = useState<number | null>(null);
+  const [pendingBlockIndex, setPendingBlockIndex] = useState<number | null>(null);
+  const wysRef = useRef<MilkdownEditorHandle>(null);
+  const srcRef = useRef<SourceViewHandle>(null);
 
   const contentRef = useRef(content);
   const dirtyRef = useRef(dirty);
@@ -49,6 +57,8 @@ export default function App() {
     setContent(text);
     setDirty(false);
     setExternalChange(false);
+    setPendingOffset(null);
+    setPendingBlockIndex(null);
     setEditorEpoch((n) => n + 1);
   }, []);
 
@@ -94,9 +104,19 @@ export default function App() {
   }, [flashStatus]);
 
   const toggleSourceMode = useCallback(() => {
-    setSourceMode((prev) => !prev);
+    // Carry the cursor over to the other view, converting through the
+    // current markdown text (offset ⇔ top-level block index).
+    const source = contentRef.current;
+    if (sourceMode) {
+      const offset = srcRef.current?.getCursorOffset();
+      setPendingBlockIndex(offset != null ? offsetToBlockIndex(source, offset) : null);
+    } else {
+      const blockIndex = wysRef.current?.getBlockIndex();
+      setPendingOffset(blockIndex != null ? blockIndexToOffset(source, blockIndex) : null);
+    }
+    setSourceMode(!sourceMode);
     setEditorEpoch((n) => n + 1);
-  }, []);
+  }, [sourceMode]);
 
   const handleChange = useCallback((markdown: string) => {
     setContent(markdown);
@@ -143,7 +163,7 @@ export default function App() {
       } else if (e.key === "/") {
         e.preventDefault();
         toggleSourceMode();
-      } else if (e.key === "e") {
+      } else if (e.key === "e" || e.key === "p") {
         e.preventDefault();
         handleExportPdf();
       } else if (e.key === "o") {
@@ -191,12 +211,20 @@ export default function App() {
               <p>「フォルダを開く」から .md ファイルのあるフォルダを選択してください。</p>
             </div>
           ) : sourceMode ? (
-            <SourceView key={`src-${filePath}-${editorEpoch}`} initialValue={content} onChange={handleChange} />
+            <SourceView
+              key={`src-${filePath}-${editorEpoch}`}
+              ref={srcRef}
+              initialValue={content}
+              initialCursorOffset={pendingOffset}
+              onChange={handleChange}
+            />
           ) : (
             <MilkdownEditor
               key={`wys-${filePath}-${editorEpoch}`}
+              ref={wysRef}
               filePath={filePath}
               initialValue={content}
+              initialBlockIndex={pendingBlockIndex}
               onChange={handleChange}
             />
           )}

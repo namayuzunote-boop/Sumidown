@@ -1,6 +1,11 @@
 /* The export renderer mounts into #print-root. On screen it is laid out
    off-viewport (mermaid needs real layout to measure text); during print
-   it becomes the only visible element. Same DOM, same CSS as the editor. */
+   it becomes the only visible element. Same DOM, same CSS as the editor.
+
+   IMPORTANT: the @media print rules are unconditional (no helper class).
+   On macOS the print dialog stays open long after window.print() returns
+   and WebKit may re-render the page when the user finally hits Save, so
+   anything time- or class-based would already have been cleaned up. */
 
 #print-root {
   position: fixed;
@@ -20,14 +25,14 @@
 }
 
 @media print {
-  html.print-mode body > #root {
-    display: none;
+  body > #root {
+    display: none !important;
   }
 
-  html.print-mode #print-root {
-    position: static;
-    left: auto;
-    width: auto;
+  #print-root {
+    position: static !important;
+    left: auto !important;
+    width: auto !important;
   }
 
   #print-root {

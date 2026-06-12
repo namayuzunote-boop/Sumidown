@@ -12,55 +12,48 @@ function printRoot(): HTMLElement {
   return root;
 }
 
+// The rendered export stays in #print-root until the next export.
+// WebKit spools the page when the user confirms the (long-lived) print
+// dialog, so tearing the DOM down on a timer would print the app UI.
+let disposeLast: (() => void) | null = null;
+
+async function renderForExport(markdown: string, filePath: string | null): Promise<HTMLElement> {
+  const root = printRoot();
+  disposeLast?.();
+  root.innerHTML = "";
+  disposeLast = await renderStatic(markdown, root, filePath);
+  return root;
+}
+
+function documentName(filePath: string | null): string {
+  return filePath?.split("/").pop()?.replace(/\.(md|markdown)$/i, "") ?? "document";
+}
+
 /**
  * Export to PDF: render static DOM with the same engine as the preview,
  * then open the system print dialog (the user picks "Save as PDF").
  * Same renderer in, same renderer out — no layout drift.
  */
 export async function exportPdf(markdown: string, filePath: string | null): Promise<void> {
-  const root = printRoot();
-  root.innerHTML = "";
-  const dispose = await renderStatic(markdown, root, filePath);
-  const prevTitle = document.title;
-  if (filePath) {
-    document.title = filePath.split("/").pop()?.replace(/\.(md|markdown)$/i, "") ?? prevTitle;
-  }
-  document.documentElement.classList.add("print-mode");
+  await renderForExport(markdown, filePath);
 
-  const cleanup = () => {
-    document.documentElement.classList.remove("print-mode");
-    document.title = prevTitle;
-    dispose();
-    root.innerHTML = "";
-    window.removeEventListener("afterprint", cleanup);
-  };
-  window.addEventListener("afterprint", cleanup);
+  // The document title becomes the suggested PDF file name.
+  const prevTitle = document.title;
+  document.title = documentName(filePath);
+  window.addEventListener("focus", () => (document.title = prevTitle), { once: true });
 
   // Give the layout a frame to settle before opening the dialog.
   await new Promise((r) => requestAnimationFrame(() => r(null)));
-  try {
-    window.print();
-  } catch (e) {
-    cleanup();
-    throw e;
-  }
-  // WebKit does not always fire afterprint; clean up on a timer as a fallback.
-  setTimeout(() => {
-    if (document.documentElement.classList.contains("print-mode")) cleanup();
-  }, 1000);
+  window.print();
 }
 
 /** Export a self-contained HTML file (app CSS inlined, mermaid SVG inline). */
 export async function exportHtml(markdown: string, filePath: string | null): Promise<string | null> {
-  const root = printRoot();
-  root.innerHTML = "";
-  const dispose = await renderStatic(markdown, root, filePath);
+  const root = await renderForExport(markdown, filePath);
   const body = root.innerHTML;
-  dispose();
-  root.innerHTML = "";
 
   const css = collectCss();
-  const name = filePath?.split("/").pop()?.replace(/\.(md|markdown)$/i, "") ?? "document";
+  const name = documentName(filePath);
   const html = `<!DOCTYPE html>
 <html>
 <head>
