@@ -207,7 +207,7 @@ export default function App() {
         <div className="editor-pane">
           {filePath === null ? (
             <div className="welcome">
-              <h2>MarkdownEditor</h2>
+              <h2>Sumidown</h2>
               <p>「フォルダを開く」から .md ファイルのあるフォルダを選択してください。</p>
             </div>
           ) : sourceMode ? (

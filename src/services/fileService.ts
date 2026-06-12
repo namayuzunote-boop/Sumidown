@@ -18,7 +18,7 @@ export const isTauri = "__TAURI_INTERNALS__" in window;
 
 const DEMO_KEY = "mdeditor-demo-doc";
 const DEMO_PATH = "/demo/welcome.md";
-const DEMO_DOC = `# MarkdownEditor へようこそ
+const DEMO_DOC = `# Sumidown へようこそ
 
 これはブラウザ確認用のデモドキュメントです。
 

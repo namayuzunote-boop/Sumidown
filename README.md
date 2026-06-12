@@ -1,8 +1,10 @@
-# MarkdownEditor
+# Sumidown
 
 **[English](README.md) | [日本語](README.ja.md)**
 
 A lightweight, simple WYSIWYG Markdown editor. Free and MIT-licensed, built with Tauri 2.
+
+*Sumidown* = **墨** (*sumi*, Japanese ink) + Mark**down** — like ink, what you write is fixed exactly as you see it, all the way to the printed page.
 
 It was built to solve three recurring pain points in a coding-agent-era Markdown workflow:
 

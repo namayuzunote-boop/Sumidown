@@ -229,7 +229,7 @@ pub fn run() {
         .setup(|app| {
             #[cfg(debug_assertions)]
             if let Some(window) = app.get_webview_window("main") {
-                let _ = window.set_title("MarkdownEditor (dev)");
+                let _ = window.set_title("Sumidown (dev)");
             }
             Ok(())
         })

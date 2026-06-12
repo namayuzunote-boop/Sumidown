@@ -1,8 +1,10 @@
-# MarkdownEditor
+# Sumidown
 
 **[English](README.md) | [日本語](README.ja.md)**
 
 軽量・シンプルな WYSIWYG Markdown エディタ。無料・MIT ライセンス(Tauri 2 製)。
+
+*Sumidown* = **墨**(sumi)+ Mark**down** — 墨のように、書いたものが見たままの姿で紙(PDF)まで定着します。
 
 コーディングエージェント時代の Markdown ワークフローにある3つの課題を解決するために作られました:
 
