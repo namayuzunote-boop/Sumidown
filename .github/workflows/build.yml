@@ -25,6 +25,12 @@ jobs:
 
       - run: npm ci
 
+      - name: Frontend unit tests
+        run: npm test
+
+      - name: Rust unit tests
+        run: cargo test --manifest-path src-tauri/Cargo.toml
+
       - name: Build app
         run: npm run tauri build
 
