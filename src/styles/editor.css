@@ -7,39 +7,6 @@
   padding: 24px 32px 50vh;
 }
 
-/* Contextual toolbar shown while the cursor is inside a table */
-.table-toolbar {
-  position: sticky;
-  top: 8px;
-  z-index: 20;
-  display: flex;
-  gap: 3px;
-  width: max-content;
-  margin: 8px auto 0;
-  padding: 4px 6px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}
-
-.table-toolbar button {
-  font: inherit;
-  font-size: 12px;
-  padding: 3px 8px;
-  border: none;
-  border-radius: 5px;
-  background: transparent;
-  color: var(--fg);
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.table-toolbar button:hover {
-  background: var(--accent-bg);
-  color: var(--accent);
-}
-
 .milkdown {
   font-size: 15px;
   line-height: 1.7;

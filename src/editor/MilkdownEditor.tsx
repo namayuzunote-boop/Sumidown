@@ -26,6 +26,8 @@ import type { EditorView } from "@milkdown/kit/prose/view";
 import { diagramView } from "./diagramView";
 import { mathBlockView } from "./mathBlockView";
 import { configureTableBlock } from "./tableConfig";
+import { TOOLBAR_ICONS } from "./icons";
+import { FORMAT_ACTIONS } from "./formatActions";
 import { resolveImageUrl, saveImage, dirOf } from "../services/fileService";
 import "katex/dist/katex.min.css";
 
@@ -42,14 +44,14 @@ interface Props {
   onChange: (markdown: string) => void;
 }
 
-const TABLE_ACTIONS: { label: string; title: string; run: typeof deleteTable }[] = [
-  { label: "↑行", title: "上に行を追加", run: addRowBefore },
-  { label: "↓行", title: "下に行を追加", run: addRowAfter },
-  { label: "←列", title: "左に列を追加", run: addColumnBefore },
-  { label: "→列", title: "右に列を追加", run: addColumnAfter },
-  { label: "行✕", title: "行を削除", run: deleteRow },
-  { label: "列✕", title: "列を削除", run: deleteColumn },
-  { label: "表✕", title: "表を削除", run: deleteTable },
+const TABLE_ACTIONS: { icon: string; title: string; run: typeof deleteTable }[] = [
+  { icon: TOOLBAR_ICONS.add_row, title: "上に行を追加", run: addRowBefore },
+  { icon: TOOLBAR_ICONS.add_row, title: "下に行を追加", run: addRowAfter },
+  { icon: TOOLBAR_ICONS.add_col, title: "左に列を追加", run: addColumnBefore },
+  { icon: TOOLBAR_ICONS.add_col, title: "右に列を追加", run: addColumnAfter },
+  { icon: TOOLBAR_ICONS.delete_row, title: "行を削除", run: deleteRow },
+  { icon: TOOLBAR_ICONS.delete_col, title: "列を削除", run: deleteColumn },
+  { icon: TOOLBAR_ICONS.trash, title: "表を削除", run: deleteTable },
 ];
 
 /**
@@ -203,19 +205,36 @@ const MilkdownEditor = forwardRef<MilkdownEditorHandle, Props>(function Milkdown
 
   return (
     <div className="editor-container">
+      <div className="format-toolbar">
+        {FORMAT_ACTIONS.map(({ icon, label, title, run }) => (
+          <button
+            key={label}
+            className="format-toolbar-button"
+            title={title}
+            aria-label={label}
+            onMouseDown={(e) => {
+              e.preventDefault(); // keep editor selection
+              const editor = editorRef.current;
+              if (editor) run(editor);
+            }}
+            dangerouslySetInnerHTML={{ __html: icon }}
+          />
+        ))}
+      </div>
       {inTable && (
         <div className="table-toolbar">
-          {TABLE_ACTIONS.map(({ label, title, run }) => (
+          {TABLE_ACTIONS.map(({ icon, title, run }) => (
             <button
-              key={label}
+              key={title}
+              className="table-toolbar-button"
               title={title}
+              aria-label={title}
               onMouseDown={(e) => {
                 e.preventDefault(); // keep editor selection
                 runTableAction(run);
               }}
-            >
-              {label}
-            </button>
+              dangerouslySetInnerHTML={{ __html: icon }}
+            />
           ))}
         </div>
       )}

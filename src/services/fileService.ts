@@ -1,5 +1,6 @@
 import { invoke, convertFileSrc } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
+import { getCurrentWebview, type DragDropEvent } from "@tauri-apps/api/webview";
 import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
 
 export interface FileNode {
@@ -101,6 +102,16 @@ export async function chooseExportPath(defaultName: string, extension: string): 
 export async function onFsChange(handler: (e: FsChangeEvent) => void): Promise<UnlistenFn> {
   if (!isTauri) return () => {};
   return listen<FsChangeEvent>("fs-change", (event) => handler(event.payload));
+}
+
+/**
+ * Subscribe to Finder/Explorer drag-and-drop onto the window.
+ * No-op in the browser fallback (drag-and-drop opens real files, which
+ * requires Tauri's filesystem access).
+ */
+export async function onFileDrop(handler: (e: DragDropEvent) => void): Promise<UnlistenFn> {
+  if (!isTauri) return () => {};
+  return getCurrentWebview().onDragDropEvent((event) => handler(event.payload));
 }
 
 /** Resolve an image src in a document to something the WebView can display. */

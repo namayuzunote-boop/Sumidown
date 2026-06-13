@@ -10,7 +10,9 @@ import {
   writeTextFile,
   createFile,
   onFsChange,
+  onFileDrop,
   isTauri,
+  dirOf,
   type FileNode,
 } from "./services/fileService";
 import { exportPdf, exportHtml } from "./services/exportService";
@@ -36,6 +38,8 @@ export default function App() {
   // offset, the WYSIWYG view gets a top-level block index.
   const [pendingOffset, setPendingOffset] = useState<number | null>(null);
   const [pendingBlockIndex, setPendingBlockIndex] = useState<number | null>(null);
+  // Highlights the drop target while a file/folder is dragged over the window.
+  const [dragActive, setDragActive] = useState(false);
   const wysRef = useRef<MilkdownEditorHandle>(null);
   const srcRef = useRef<SourceViewHandle>(null);
 
@@ -62,15 +66,21 @@ export default function App() {
     setEditorEpoch((n) => n + 1);
   }, []);
 
-  const handleOpenFolder = useCallback(async () => {
-    const dir = await chooseFolder();
-    if (!dir) return;
+  // Opens `dir` as the project folder and loads its first markdown file
+  // (unless `andLoad` points at a specific file to open instead).
+  const openFolderPath = useCallback(async (dir: string, andLoad?: string) => {
     const nodes = await openFolder(dir);
     setFolder(dir);
     setTree(nodes);
-    const firstFile = findFirstFile(nodes);
-    if (firstFile) await loadFile(firstFile);
+    const target = andLoad ?? findFirstFile(nodes);
+    if (target) await loadFile(target);
   }, [loadFile]);
+
+  const handleOpenFolder = useCallback(async () => {
+    const dir = await chooseFolder();
+    if (!dir) return;
+    await openFolderPath(dir);
+  }, [openFolderPath]);
 
   const handleSave = useCallback(async () => {
     if (!filePathRef.current) return;
@@ -80,11 +90,10 @@ export default function App() {
     flashStatus("保存しました");
   }, [flashStatus]);
 
-  const handleNewFile = useCallback(async () => {
+  const handleNewFile = useCallback(async (name: string) => {
     if (!folder) return;
-    const name = window.prompt("新しいファイル名 (.md)", "untitled.md");
-    if (!name) return;
-    const path = `${folder}/${name.endsWith(".md") ? name : `${name}.md`}`;
+    const fileName = /\.(md|markdown)$/i.test(name) ? name : `${name}.md`;
+    const path = `${folder}/${fileName}`;
     try {
       await createFile(path);
       setTree(await listTree());
@@ -152,6 +161,32 @@ export default function App() {
     };
   }, []);
 
+  // Drag & drop a folder or .md file from Finder onto the window.
+  useEffect(() => {
+    const unlisten = onFileDrop((e) => {
+      if (e.type === "enter" || e.type === "over") {
+        setDragActive(true);
+        return;
+      }
+      if (e.type === "leave") {
+        setDragActive(false);
+        return;
+      }
+      // type === "drop"
+      setDragActive(false);
+      const path = e.paths[0];
+      if (!path) return;
+      if (/\.(md|markdown)$/i.test(path)) {
+        openFolderPath(dirOf(path), path).catch((err) => flashStatus(String(err)));
+      } else {
+        openFolderPath(path).catch((err) => flashStatus(String(err)));
+      }
+    });
+    return () => {
+      unlisten.then((fn) => fn());
+    };
+  }, [openFolderPath, flashStatus]);
+
   // Keyboard shortcuts
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -177,9 +212,13 @@ export default function App() {
 
   return (
     <div className="app">
+      {dragActive && (
+        <div className="drop-overlay">
+          <div className="drop-overlay-message">ドロップしてフォルダ/ファイルを開く</div>
+        </div>
+      )}
       <div className="toolbar">
         <button onClick={handleOpenFolder} title="⌘O">フォルダを開く</button>
-        <button onClick={handleNewFile} disabled={!folder}>新規</button>
         <button onClick={handleSave} disabled={!filePath || !dirty} title="⌘S">
           保存{dirty ? " ●" : ""}
         </button>
@@ -203,7 +242,14 @@ export default function App() {
       )}
 
       <div className="main">
-        <Sidebar tree={tree} currentPath={filePath} dirty={dirty} onSelect={loadFile} />
+        <Sidebar
+          tree={tree}
+          currentPath={filePath}
+          dirty={dirty}
+          folderOpen={!!folder}
+          onSelect={loadFile}
+          onCreateFile={handleNewFile}
+        />
         <div className="editor-pane">
           {filePath === null ? (
             <div className="welcome">
