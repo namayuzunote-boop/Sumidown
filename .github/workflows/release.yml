@@ -1,0 +1,52 @@
+name: Release
+
+# Pushing a tag like `v0.1.0` builds the app and attaches the .dmg to a
+# GitHub Release. The release is created as a DRAFT — review the notes and
+# assets, then click "Publish release" to make it public.
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release-macos:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - run: npm ci
+
+      - name: Build and create draft release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: "Sumidown ${{ github.ref_name }}"
+          releaseBody: |
+            ### Download
+
+            Download `Sumidown_*.dmg` from the assets below, open it, and drag
+            **Sumidown** into your Applications folder.
+
+            > Currently macOS (Apple Silicon) only. On first launch, right-click
+            > the app and choose "Open" to bypass the unsigned-app warning.
+          releaseDraft: true
+          prerelease: false
+
+  # Windows / Linux release jobs can be added here later by copying this job
+  # and changing runs-on (once path handling is made cross-platform).

@@ -12,6 +12,12 @@ It was built to solve three recurring pain points in a coding-agent-era Markdown
 2. **You can't edit while previewing** → The editor is always WYSIWYG. Tables can be edited directly in cells plus a GUI for adding/removing rows and columns; Mermaid diagrams and math blocks are edited by clicking on them.
 3. **Diagrams don't render** → Mermaid blocks (flowcharts, sequence diagrams, etc.) are rendered immediately.
 
+## Download
+
+Grab the latest `.dmg` from the [**Releases**](https://github.com/namayuzunote-boop/Sumidown/releases) page, open it, and drag **Sumidown** into your Applications folder.
+
+> Currently macOS (Apple Silicon) only. The app is unsigned, so on first launch right-click it and choose **Open** to bypass Gatekeeper.
+
 ## Features
 
 - **WYSIWYG editing** (Typora-style) with a source-view toggle (⌘/)

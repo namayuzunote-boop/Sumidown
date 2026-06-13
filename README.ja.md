@@ -12,6 +12,12 @@
 2. **プレビュー状態で編集できない** → 常に WYSIWYG。テーブルはセル直接編集+行/列のGUI追加・削除、Mermaid 図と数式はクリックでコード編集
 3. **図が表示できない** → Mermaid(フローチャート・シーケンス図など)を即時レンダリング
 
+## ダウンロード
+
+[**Releases**](https://github.com/namayuzunote-boop/Sumidown/releases) ページから最新の `.dmg` を入手し、開いて **Sumidown** をアプリケーションフォルダへドラッグしてください。
+
+> 現状は macOS(Apple Silicon)のみ対応。アプリは未署名のため、初回起動時はアプリを右クリックして **開く** を選び、Gatekeeper の警告を回避してください。
+
 ## 機能
 
 - **WYSIWYG 編集**(Typora スタイル)+ ソース表示トグル(⌘/)
