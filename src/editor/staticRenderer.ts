@@ -73,7 +73,10 @@ function fitTables(container: HTMLElement) {
 async function waitForDiagrams(container: HTMLElement, timeoutMs = 5000): Promise<void> {
   const start = Date.now();
   for (;;) {
-    const pending = container.querySelectorAll(".milkdown [data-type='diagram']:not(:has(svg))");
+    const diagrams = Array.from(
+      container.querySelectorAll(".milkdown [data-type='diagram']"),
+    );
+    const pending = diagrams.filter((d) => !d.querySelector("svg"));
     if (pending.length === 0) return;
     if (Date.now() - start > timeoutMs) return;
     await new Promise((r) => setTimeout(r, 100));
